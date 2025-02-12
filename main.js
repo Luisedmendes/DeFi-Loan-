@@ -1,34 +1,34 @@
-
-function requestLoan(asset) {
+async function requestLoan(assetId, tokenAmount, ltvRatio) {
   
-  const ltvRatio = 0.9;
+  const mockApiResponse = (assetId, tokenAmount, ltvRatio) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const loanAmount = tokenAmount * ltvRatio;
+        const loanApproved = loanAmount > 0; 
+        resolve({
+          loan_approved: loanApproved,
+          loan_amount: loanApproved ? loanAmount : 0,
+        });
+      }, 1000); 
+    });
+  };
 
   
-  const loanAmount = asset.token_amount * ltvRatio;
-
-  
-  if (asset.token_amount >= 1000) { 
-    return {
-      loan_approved: true,
-      loan_amount: loanAmount
-    };
-  } else {
-    return {
-      loan_approved: false,
-      loan_amount: 0
-    };
-  }
+  const response = await mockApiResponse(assetId, tokenAmount, ltvRatio);
+  return response;
 }
 
 
-const asset = {
+const loanRequest = {
   asset_id: "1234",
-  token_amount: 10000,  
-  ltv_ratio: 0.9
+  token_amount: 10000,
+  ltv_ratio: 0.9,
 };
 
-
-const loanResponse = requestLoan(asset);
-
-
-console.log(JSON.stringify(loanResponse, null, 2));
+requestLoan(loanRequest.asset_id, loanRequest.token_amount, loanRequest.ltv_ratio)
+  .then((result) => {
+    console.log("Loan Response:", result);
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
